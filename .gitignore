@@ -1,0 +1,12 @@
+# Build outputs
+/build/
+*.o
+*.out
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# OS/editor files
+.DS_Store
+Thumbs.db
