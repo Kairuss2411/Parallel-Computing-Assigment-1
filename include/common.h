@@ -7,8 +7,10 @@
 #include <cstdint>
 #include <thread>
 
+#if defined(__linux__)
 #include <pthread.h>
 #include <sched.h>
+#endif
 
 #if defined(__x86_64__) || defined(__i386__)
 #include <immintrin.h>
@@ -35,10 +37,15 @@ inline void cpu_relax() {
 // Returns false if pinning is not permitted (e.g. restricted container); harmless.
 inline bool pin_thread(int core) {
     if (core < 0) return false;
+#if defined(__linux__)
     cpu_set_t set;
     CPU_ZERO(&set);
     CPU_SET(core, &set);
     return pthread_setaffinity_np(pthread_self(), sizeof(set), &set) == 0;
+#else
+    (void)core;
+    return false;
+#endif
 }
 
 inline int hw_threads() {
