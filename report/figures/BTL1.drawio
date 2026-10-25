@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36" pages="3">
   <diagram id="Z4j26PEaVpNP2FK8GLd0" name="TAS">
     <mxGraphModel dx="1957" dy="613" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
@@ -1075,6 +1076,635 @@
         <mxCell id="JOMgxV3eXeBIXmy-hE1r-21" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;aspect=fixed;fillColor=#e1d5e7;strokeColor=#9673a6;dashed=1;" value="&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
           <mxGeometry height="69" width="69" x="459" y="531" as="geometry" />
         </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+<diagram name="TAS (memory order)" id="mo-tas">
+    <mxGraphModel dx="1500" dy="1030" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1030" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="tas-title" value="TAS: release tại P1 synchronizes-with acquire tại P2" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="150" y="10" width="1200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tas-h1" value="P1 (giữ lock trước)" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#1a73e8;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="180" y="40" width="480" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tas-h2" value="P2 (spin chờ lock)" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#188038;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="820" y="40" width="480" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tas-time" style="edgeStyle=none;html=1;endArrow=classic;endSize=8;strokeColor=#9aa0a6;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="60" y="70" as="sourcePoint" />
+            <mxPoint x="60" y="990" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tas-tlabel" value="thời gian" style="text;html=1;align=center;verticalAlign=middle;rotation=-90;fontSize=10.5;fontColor=#9aa0a6;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="5" y="480" width="50" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tas-lane1" style="edgeStyle=none;html=1;endArrow=none;strokeColor=#dadce0;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="420" y="95" as="sourcePoint" />
+            <mxPoint x="420" y="890" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tas-lane2" style="edgeStyle=none;html=1;endArrow=none;strokeColor=#dadce0;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1060" y="95" as="sourcePoint" />
+            <mxPoint x="1060" y="890" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="tas-b1" value="exchange(true, acquire) → false&#10;P1 giữ lock" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#e8f0fe;strokeColor=#1a73e8;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="180" y="115" width="480" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="tas-b2" value="data = 42   (ghi thường)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#fef7e0;strokeColor=#e37400;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="180" y="315" width="480" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="tas-b3" value="flag.store(false, release)&#10;P1 mở lock" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#fce8e6;strokeColor=#d93025;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="180" y="495" width="480" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="tas-note1" value="ghi trong CS không được dời xuống sau store" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#d93025;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="150" y="610" width="540" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tas-b4" value="while (exchange(true, acquire))&#10;    → true: lặp (spin)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#f1f3f4;strokeColor=#5f6368;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="110" width="480" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="tas-b5" value="exchange(true, acquire) → false&#10;P2 giữ lock" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#e6f4ea;strokeColor=#188038;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="605" width="480" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="tas-b6" value="đọc data → 42" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#e6f4ea;strokeColor=#188038;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="785" width="480" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="tas-note2" value="đọc sau acquire không được dời lên trước" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#d93025;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="790" y="720" width="540" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tas-loop" style="edgeStyle=none;curved=1;html=1;endArrow=classic;endSize=6;strokeColor=#5f6368;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="820" y="125" as="sourcePoint" />
+            <mxPoint x="820" y="185" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="760" y="155" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tas-looplabel" value="lặp" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#5f6368;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="725" y="140" width="55" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tas-sync" style="edgeStyle=none;curved=1;html=1;endArrow=block;endSize=8;endFill=1;strokeColor=#188038;strokeWidth=2.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="660" y="540" as="sourcePoint" />
+            <mxPoint x="820" y="635" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tas-synclabel" value="synchronizes-with" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#188038;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="665" y="490" width="155" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tas-hb" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;dashPattern=6 4;strokeColor=#34a853;strokeWidth=2;endArrow=block;endSize=8;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="660" y="350" as="sourcePoint" />
+            <mxPoint x="1300" y="820" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1420" y="350" />
+              <mxPoint x="1420" y="820" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tas-hblabel" value="happens-before" style="text;html=1;align=center;verticalAlign=middle;rotation=-90;fontSize=11;fontColor=#188038;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1435" y="510" width="40" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tas-bottom" value="Nếu dùng relaxed: P2 vẫn giữ lock nhưng có thể đọc data cũ (0)." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#f1f3f4;strokeColor=#dadce0;fontSize=10.5;" vertex="1" parent="1">
+          <mxGeometry x="280" y="930" width="1000" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram name="TTAS (memory order)" id="mo-ttas">
+    <mxGraphModel dx="1500" dy="1030" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1030" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="ttas-title" value="TTAS: vòng chờ dùng load(relaxed); acquire/release giống TAS" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="100" y="10" width="1300" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ttas-h1" value="P1 (giữ lock trước)" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#1a73e8;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="180" y="40" width="480" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ttas-h2" value="P2 (spin bằng load relaxed)" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#5f6368;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="820" y="40" width="480" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ttas-time" style="edgeStyle=none;html=1;endArrow=classic;endSize=8;strokeColor=#9aa0a6;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="60" y="70" as="sourcePoint" />
+            <mxPoint x="60" y="990" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ttas-tlabel" value="thời gian" style="text;html=1;align=center;verticalAlign=middle;rotation=-90;fontSize=10.5;fontColor=#9aa0a6;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="5" y="480" width="50" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ttas-lane1" style="edgeStyle=none;html=1;endArrow=none;strokeColor=#dadce0;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="420" y="95" as="sourcePoint" />
+            <mxPoint x="420" y="890" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ttas-lane2" style="edgeStyle=none;html=1;endArrow=none;strokeColor=#dadce0;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1060" y="95" as="sourcePoint" />
+            <mxPoint x="1060" y="890" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="ttas-b1" value="exchange(true, acquire) → false&#10;P1 giữ lock" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#e8f0fe;strokeColor=#1a73e8;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="180" y="115" width="480" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ttas-b2" value="data = 42   (ghi thường)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#fef7e0;strokeColor=#e37400;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="180" y="305" width="480" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ttas-b3" value="flag.store(false, release)&#10;P1 mở lock" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#fce8e6;strokeColor=#d93025;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="180" y="475" width="480" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ttas-b4" value="while (flag.load(relaxed))&#10;    cpu_relax()" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#f1f3f4;strokeColor=#5f6368;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="110" width="480" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="ttas-text1" value="chỉ đọc → cache line giữ trạng thái Shared" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#5f6368;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="790" y="255" width="540" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ttas-text2" value="chỉ khi thấy false mới thử exchange" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#5f6368;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="830" y="425" width="460" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ttas-b5" value="exchange(true, acquire) → false&#10;P2 giữ lock" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#e6f4ea;strokeColor=#188038;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="555" width="480" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ttas-text3" value="exchange trả true (thua race) → quay lại vòng load" style="text;html=1;align=center;verticalAlign=middle;fontSize=9.5;fontColor=#5f6368;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="760" y="690" width="600" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ttas-b6" value="đọc data → 42" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#e6f4ea;strokeColor=#188038;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="785" width="480" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ttas-loop" style="edgeStyle=none;curved=1;html=1;endArrow=classic;endSize=6;strokeColor=#5f6368;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="820" y="125" as="sourcePoint" />
+            <mxPoint x="820" y="185" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="760" y="155" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ttas-looplabel" value="lặp" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#5f6368;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="725" y="140" width="55" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ttas-retry" style="edgeStyle=none;curved=1;dashed=1;dashPattern=5 4;html=1;endArrow=classic;endSize=6;strokeColor=#5f6368;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="820" y="555" as="sourcePoint" />
+            <mxPoint x="820" y="210" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="745" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="ttas-sync" style="edgeStyle=none;curved=1;html=1;endArrow=block;endSize=8;endFill=1;strokeColor=#188038;strokeWidth=2.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="660" y="520" as="sourcePoint" />
+            <mxPoint x="820" y="590" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ttas-synclabel" value="synchronizes-with" style="text;html=1;align=center;verticalAlign=middle;fontSize=10.5;fontColor=#188038;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="640" y="600" width="155" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ttas-hb" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;dashPattern=6 4;strokeColor=#34a853;strokeWidth=2;endArrow=block;endSize=8;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="660" y="340" as="sourcePoint" />
+            <mxPoint x="1300" y="820" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1420" y="340" />
+              <mxPoint x="1420" y="820" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ttas-hblabel" value="happens-before" style="text;html=1;align=center;verticalAlign=middle;rotation=-90;fontSize=11;fontColor=#188038;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1435" y="510" width="40" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ttas-bottom" value="Relaxed load chỉ là tối ưu hiệu năng: không ghi nên không giành quyền sở hữu cache line.&#10;Visibility vẫn do cặp store(release)/exchange(acquire) quyết định, giống TAS." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#f1f3f4;strokeColor=#dadce0;fontSize=10.5;" vertex="1" parent="1">
+          <mxGeometry x="205" y="920" width="1150" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram name="MCS (memory order)" id="mo-mcs">
+    <mxGraphModel dx="1500" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="mcs-title" value="MCS: công bố node (release) và CAS tail (acq_rel) khi tìm successor" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="150" y="20" width="1200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mcs-h1" value="A (đang giữ lock, tail = &amp;A)" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#1a73e8;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="180" y="50" width="480" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-h2" value="B (enqueue đồng thời với A.release)" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#188038;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="820" y="50" width="480" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mcs-time" style="edgeStyle=none;html=1;endArrow=classic;endSize=8;strokeColor=#9aa0a6;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="60" y="80" as="sourcePoint" />
+            <mxPoint x="60" y="1270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mcs-tlabel" value="thời gian" style="text;html=1;align=center;verticalAlign=middle;rotation=-90;fontSize=10.5;fontColor=#9aa0a6;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="5" y="605" width="50" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mcs-lane1" style="edgeStyle=none;html=1;endArrow=none;strokeColor=#dadce0;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="420" y="105" as="sourcePoint" />
+            <mxPoint x="420" y="1240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mcs-lane2" style="edgeStyle=none;html=1;endArrow=none;strokeColor=#dadce0;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1060" y="105" as="sourcePoint" />
+            <mxPoint x="1060" y="1240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="mcs-b1" value="data = 42   (ghi trong CS)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#fef7e0;strokeColor=#e37400;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="180" y="175" width="480" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-b2" value="A.next.load(acquire) → nullptr" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#f1f3f4;strokeColor=#5f6368;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="180" y="305" width="480" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-b3" value="CAS(tail: &amp;A → nullptr, acq_rel)&#10;→ false; expected = &amp;B" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="180" y="438" width="480" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-note1" value="failure order mặc định = acquire" style="text;html=1;align=center;verticalAlign=middle;fontSize=9.5;fontColor=#7b1fa2;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="270" y="530" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-b4" value="while (!(A.next.load(acquire)))&#10;    cpu_relax()   → &amp;B" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#f1f3f4;strokeColor=#5f6368;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="180" y="728" width="480" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-b5" value="B.locked.store(false, release)&#10;bàn giao (giống TAS)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#fce8e6;strokeColor=#d93025;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="180" y="878" width="480" height="85" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mcs-b6" value="tail.exchange(&amp;B, acq_rel) → &amp;A&#10;(đưa B vào tail, đọc pred = &amp;A)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="368" width="480" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-b7" value="B.locked.store(true, relaxed)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#f1f3f4;strokeColor=#5f6368;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="508" width="480" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-note2" value="relaxed — lệnh release bên dưới sắp thứ tự" style="text;html=1;align=center;verticalAlign=middle;fontSize=9.5;fontColor=#5f6368;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="800" y="585" width="520" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-b8" value="A.next.store(&amp;B, release)&#10;(công bố node B)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#fce8e6;strokeColor=#d93025;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="628" width="480" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-b9" value="while (B.locked.load(acquire))&#10;    cpu_relax()   (giống TAS)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#f1f3f4;strokeColor=#5f6368;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="790" width="480" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-b10" value="B.locked.load(acquire) → false&#10;B giữ lock (giống TAS)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#e6f4ea;strokeColor=#188038;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="990" width="480" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="mcs-b11" value="đọc data → 42" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#e6f4ea;strokeColor=#188038;strokeWidth=1.5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="1125" width="480" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mcs-exchange-cas" style="edgeStyle=none;curved=1;dashed=1;dashPattern=5 4;html=1;endArrow=block;endSize=7;endFill=1;strokeColor=#7b1fa2;strokeWidth=1.8;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="820" y="410" as="sourcePoint" />
+            <mxPoint x="660" y="480" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mcs-excas-label" value="tail = &amp;B ⇒ CAS fail" style="text;html=1;align=center;verticalAlign=middle;fontSize=9.5;fontColor=#7b1fa2;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="665" y="360" width="150" height="28" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mcs-publish-retry" style="edgeStyle=none;curved=1;html=1;endArrow=block;endSize=8;endFill=1;strokeColor=#188038;strokeWidth=2.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="820" y="670" as="sourcePoint" />
+            <mxPoint x="660" y="770" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mcs-pub-label" value="release → acquire" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#188038;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="645" y="630" width="170" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mcs-handoff" style="edgeStyle=none;curved=1;html=1;endArrow=block;endSize=8;endFill=1;strokeColor=#188038;strokeWidth=2.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="660" y="920" as="sourcePoint" />
+            <mxPoint x="820" y="1030" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mcs-handoff-label" value="release → acquire" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#188038;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="665" y="885" width="160" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mcs-hb" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;dashPattern=6 4;strokeColor=#34a853;strokeWidth=2;endArrow=block;endSize=8;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="660" y="210" as="sourcePoint" />
+            <mxPoint x="1300" y="1160" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1420" y="210" />
+              <mxPoint x="1420" y="1160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mcs-hblabel" value="happens-before" style="text;html=1;align=center;verticalAlign=middle;rotation=-90;fontSize=11;fontColor=#188038;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1435" y="620" width="40" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mcs-bottom" value="Các thao tác trên locked (spin acquire + handoff release) giữ nguyên scheme acquire/release của TAS." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#f1f3f4;strokeColor=#dadce0;fontSize=10.5;" vertex="1" parent="1">
+          <mxGeometry x="180" y="1252" width="1200" height="45" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+<diagram name="MCS concept" id="mcs-concept">
+    <mxGraphModel dx="1861" dy="1107" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1110" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c5" parent="1" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=18;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="Lifecycle of one thread" vertex="1">
+          <mxGeometry height="28" width="900" x="40" y="126" as="geometry" />
+        </mxCell>
+        <mxCell id="c6" parent="1" style="rounded=1;html=1;fillColor=#fbfcfd;strokeColor=#d0d7de;" value="" vertex="1">
+          <mxGeometry height="370" width="1520" x="40" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="c8" parent="1" style="rounded=1;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="" vertex="1">
+          <mxGeometry height="70" width="150" x="70" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="c9" parent="c8" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=16;fontColor=#1f4e79;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="ACQUIRE" vertex="1">
+          <mxGeometry height="28" width="150" y="8" as="geometry" />
+        </mxCell>
+        <mxCell id="c10" parent="c8" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=11;fontColor=#57606a;fontFamily=Helvetica;spacing=0;" value="ask for the lock" vertex="1">
+          <mxGeometry height="22" width="150" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="c11" parent="1" style="rounded=1;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="" vertex="1">
+          <mxGeometry height="70" width="160" x="270" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="c12" parent="c11" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=16;fontColor=#4b2e5e;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="ENQUEUE" vertex="1">
+          <mxGeometry height="28" width="160" y="8" as="geometry" />
+        </mxCell>
+        <mxCell id="c13" parent="c11" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=11;fontColor=#57606a;fontFamily=Helvetica;spacing=0;" value="join at the tail" vertex="1">
+          <mxGeometry height="22" width="160" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="c14" parent="1" style="rhombus;html=1;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;fontColor=#1f2328;" value="no&#10;predecessor?" vertex="1">
+          <mxGeometry height="120" width="180" x="480" y="235" as="geometry" />
+        </mxCell>
+        <mxCell id="c15" parent="1" style="rounded=1;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="" vertex="1">
+          <mxGeometry height="80" width="210" x="730" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="c16" parent="c15" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=16;fontColor=#1e4a1e;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="CRITICAL SECTION" vertex="1">
+          <mxGeometry height="28" width="210" y="8" as="geometry" />
+        </mxCell>
+        <mxCell id="c17" parent="c15" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=11;fontColor=#57606a;fontFamily=Helvetica;spacing=0;" value="holds the lock" vertex="1">
+          <mxGeometry height="22" width="210" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="c18" parent="1" style="rounded=1;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="" vertex="1">
+          <mxGeometry height="70" width="150" x="990" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="c19" parent="c18" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=16;fontColor=#1f4e79;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="RELEASE" vertex="1">
+          <mxGeometry height="28" width="150" y="8" as="geometry" />
+        </mxCell>
+        <mxCell id="c20" parent="c18" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=11;fontColor=#57606a;fontFamily=Helvetica;spacing=0;" value="give up the lock" vertex="1">
+          <mxGeometry height="22" width="150" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="c21" parent="1" style="rounded=1;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="" vertex="1">
+          <mxGeometry height="70" width="180" x="1190" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="c22" parent="c21" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=16;fontColor=#7a4a00;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="HANDOFF" vertex="1">
+          <mxGeometry height="28" width="180" y="8" as="geometry" />
+        </mxCell>
+        <mxCell id="c23" parent="c21" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=11;fontColor=#57606a;fontFamily=Helvetica;spacing=0;" value="wake next waiter" vertex="1">
+          <mxGeometry height="22" width="180" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="c24" parent="1" style="rounded=1;html=1;fillColor=#f5f5f5;strokeColor=#999999;dashed=1;fontSize=12;fontStyle=1;fontColor=#57606a;whiteSpace=wrap;" value="NEXT WAITER&#10;cycle repeats" vertex="1">
+          <mxGeometry height="50" width="140" x="1410" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="c25" parent="1" style="rounded=1;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="" vertex="1">
+          <mxGeometry height="70" width="190" x="740" y="415" as="geometry" />
+        </mxCell>
+        <mxCell id="c26" parent="c25" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=16;fontColor=#7a5b00;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="SPIN" vertex="1">
+          <mxGeometry height="28" width="190" y="21" as="geometry" />
+        </mxCell>
+        <mxCell id="e28" edge="1" parent="1" source="c8" style="edgeStyle=none;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="c11" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e29" edge="1" parent="1" source="c11" style="edgeStyle=none;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="c14" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e30" edge="1" parent="1" source="c14" style="edgeStyle=none;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="c15" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e31" edge="1" parent="1" source="c15" style="edgeStyle=none;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="c18" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e32" edge="1" parent="1" source="c18" style="edgeStyle=none;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="c21" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e33" edge="1" parent="1" source="c21" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;strokeColor=#d79b00;dashed=1;strokeWidth=2;fontColor=#b06d00;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="c24" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e34" edge="1" parent="1" source="c14" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=0.5;exitY=1;entryX=0;entryY=0.5;" target="c25" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="570" y="450" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e35" edge="1" parent="1" source="c25" style="edgeStyle=none;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;strokeColor=#d79b00;strokeWidth=2;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" target="c15" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c36" parent="1" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#57606a;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="yes" vertex="1">
+          <mxGeometry height="20" width="40" x="680" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="c37" parent="1" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#57606a;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="no" vertex="1">
+          <mxGeometry height="20" width="30" x="582" y="375" as="geometry" />
+        </mxCell>
+        <mxCell id="c38" parent="1" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=11;fontColor=#b06d00;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="woken by HANDOFF" vertex="1">
+          <mxGeometry height="20" width="160" x="850" y="365" as="geometry" />
+        </mxCell>
+        <mxCell id="c39" parent="1" style="rounded=1;html=1;fillColor=#ffffff;strokeColor=#d0d7de;" value="" vertex="1">
+          <mxGeometry height="398" width="1520" x="40" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="c40" parent="1" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=18;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="FIFO queue" vertex="1">
+          <mxGeometry height="28" width="1200" x="60" y="575" as="geometry" />
+        </mxCell>
+        <mxCell id="c42" parent="1" style="swimlane;startSize=30;html=1;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=14;" value="Thread 1 — holder" vertex="1">
+          <mxGeometry height="160" width="230" x="140" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="c43" parent="c42" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="owns the lock" vertex="1">
+          <mxGeometry height="28" width="206" x="12" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="c44" parent="c42" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;" value="in critical section" vertex="1">
+          <mxGeometry height="28" width="206" x="12" y="72" as="geometry" />
+        </mxCell>
+        <mxCell id="c45" parent="c42" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;" value="no spin" vertex="1">
+          <mxGeometry height="28" width="206" x="12" y="106" as="geometry" />
+        </mxCell>
+        <mxCell id="c46" parent="1" style="swimlane;startSize=30;html=1;rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=14;" value="Thread 2 — waiter" vertex="1">
+          <mxGeometry height="160" width="230" x="540" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="c47" parent="c46" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="SPIN on own node" vertex="1">
+          <mxGeometry height="28" width="206" x="12" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="c48" parent="c46" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;" value="waiting for HANDOFF" vertex="1">
+          <mxGeometry height="28" width="206" x="12" y="72" as="geometry" />
+        </mxCell>
+        <mxCell id="c49" parent="c46" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;" value="FIFO #1" vertex="1">
+          <mxGeometry height="28" width="206" x="12" y="106" as="geometry" />
+        </mxCell>
+        <mxCell id="c50" parent="1" style="swimlane;startSize=30;html=1;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=14;" value="Thread 3 — waiter" vertex="1">
+          <mxGeometry height="160" width="230" x="940" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="c51" parent="c50" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="SPIN on own node" vertex="1">
+          <mxGeometry height="28" width="206" x="12" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="c52" parent="c50" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;" value="waiting for HANDOFF" vertex="1">
+          <mxGeometry height="28" width="206" x="12" y="72" as="geometry" />
+        </mxCell>
+        <mxCell id="c53" parent="c50" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;" value="FIFO #2" vertex="1">
+          <mxGeometry height="28" width="206" x="12" y="106" as="geometry" />
+        </mxCell>
+        <mxCell id="c54" parent="1" style="rounded=1;html=1;fillColor=#f5f5f5;strokeColor=#999999;dashed=1;fontSize=13;fontFamily=Consolas;" value="null" vertex="1">
+          <mxGeometry height="60" width="90" x="1330" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="e55" edge="1" parent="1" source="c42" style="edgeStyle=none;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="c46" value="next">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e56" edge="1" parent="1" source="c46" style="edgeStyle=none;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="c50" value="next">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e57" edge="1" parent="1" source="c50" style="edgeStyle=none;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="c54" value="next">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e58" edge="1" parent="1" source="c42" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;strokeColor=#d79b00;dashed=1;strokeWidth=2;fontColor=#b06d00;exitX=0.5;exitY=0;entryX=0.5;entryY=0;" target="c46" value="HANDOFF: wake T2 only">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="255" y="670" />
+              <mxPoint x="655" y="670" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c59" parent="1" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;fontStyle=1;" value="tail" vertex="1">
+          <mxGeometry height="24" width="60" x="1025" y="915" as="geometry" />
+        </mxCell>
+        <mxCell id="e60" edge="1" parent="1" source="c59" style="edgeStyle=none;html=1;rounded=1;orthogonalLoop=1;jettySize=auto;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.6;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" target="c50" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+<diagram name="MCS pseudocode" id="mcs-pseudocode">
+    <mxGraphModel dx="1600" dy="1250" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1250" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c2" value="MCS Lock — FIFO queue spinlock" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=30;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="40" y="30" width="1520" height="44" as="geometry" /></mxCell>
+        <mxCell id="c3" value="Pseudocode from include/lock_mcs.h (C++20) · each waiter spins on its own cache-line-aligned node" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#57606a;fontFamily=Helvetica;spacing=0;" vertex="1" parent="1"><mxGeometry x="40" y="74" width="1520" height="26" as="geometry" /></mxCell>
+        <mxCell id="c4" value="" style="rounded=0;html=1;fillColor=none;strokeColor=#d0d7de;strokeWidth=1;" vertex="1" parent="1"><mxGeometry x="40" y="108" width="1520" height="1" as="geometry" /></mxCell>
+        <mxCell id="c5" value="" style="rounded=1;html=1;fillColor=#f6f8fa;strokeColor=#d0d7de;" vertex="1" parent="1"><mxGeometry x="40" y="120" width="740" height="160" as="geometry" /></mxCell>
+        <mxCell id="c6" value="Node — one per thread, cache-line aligned" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=15;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="60" y="132" width="700" height="24" as="geometry" /></mxCell>
+        <mxCell id="c7" value="struct alignas(64) MCSNode {" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="162" width="700" height="24" as="geometry" /></mxCell>
+        <mxCell id="c8" value="    std::atomic&lt;MCSNode*&gt; next{nullptr};" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="186" width="700" height="24" as="geometry" /></mxCell>
+        <mxCell id="c9" value="    std::atomic&lt;bool&gt;     locked{false};" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="210" width="700" height="24" as="geometry" /></mxCell>
+        <mxCell id="c10" value="};" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="234" width="700" height="24" as="geometry" /></mxCell>
+        <mxCell id="c11" value="" style="rounded=1;html=1;fillColor=#fff8e1;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="800" y="120" width="760" height="160" as="geometry" /></mxCell>
+        <mxCell id="c12" value="Why it scales" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=16;fontColor=#7a5b00;fontFamily=Helvetica;spacing=0;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="820" y="132" width="720" height="24" as="geometry" /></mxCell>
+        <mxCell id="c13" value="• FIFO fairness: tail.exchange() appends each waiter to the queue." style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="164" width="720" height="26" as="geometry" /></mxCell>
+        <mxCell id="c14" value="• Each thread spins on its own locked flag → no single hot cache line." style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="192" width="720" height="26" as="geometry" /></mxCell>
+        <mxCell id="c15" value="• O(1) space per thread; node is thread_local (one MCS lock per thread)." style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="220" width="720" height="26" as="geometry" /></mxCell>
+        <mxCell id="c16" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=#d0d7de;" vertex="1" parent="1"><mxGeometry x="40" y="300" width="740" height="390" as="geometry" /></mxCell>
+        <mxCell id="c17" value="" style="rounded=0;html=1;fillColor=#0969da;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="40" y="300" width="740" height="6" as="geometry" /></mxCell>
+        <mxCell id="c18" value="acquire()" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=22;fontColor=#0b3d6e;fontFamily=Helvetica;spacing=0;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="60" y="316" width="700" height="32" as="geometry" /></mxCell>
+        <mxCell id="c19" value="enqueue self, then wait until the predecessor hands off" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#57606a;fontFamily=Helvetica;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="350" width="700" height="22" as="geometry" /></mxCell>
+        <mxCell id="c20" value="MCSNode&amp; me = my_node();" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="386" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c21" value="// thread_local" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="590" y="386" width="170" height="24" as="geometry" /></mxCell>
+        <mxCell id="c22" value="me.next.store(nullptr, relaxed);" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="412" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c23" value="// clear stale link" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="590" y="412" width="170" height="24" as="geometry" /></mxCell>
+        <mxCell id="c24" value="MCSNode* pred = tail.exchange(&amp;me, acq_rel);" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="438" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c25" value="// append to queue" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="590" y="438" width="170" height="24" as="geometry" /></mxCell>
+        <mxCell id="c26" value="if (pred != nullptr) {" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="464" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c27" value="    me.locked.store(true, relaxed);" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="490" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c28" value="// wait for handoff" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="590" y="490" width="170" height="24" as="geometry" /></mxCell>
+        <mxCell id="c29" value="    pred-&gt;next.store(&amp;me, release);" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="516" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c30" value="// publish my node" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="590" y="516" width="170" height="24" as="geometry" /></mxCell>
+        <mxCell id="c31" value="    while (me.locked.load(acquire))" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="542" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c32" value="// spin on MY flag" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="590" y="542" width="170" height="24" as="geometry" /></mxCell>
+        <mxCell id="c33" value="        cpu_relax();" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="568" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c34" value="// relaxed pause" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="590" y="568" width="170" height="24" as="geometry" /></mxCell>
+        <mxCell id="c35" value="}" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="594" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c36" value="Only me.locked and pred-&gt;next are written; there is no shared spin line." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#57606a;fontFamily=Helvetica;spacing=0;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="60" y="636" width="700" height="38" as="geometry" /></mxCell>
+        <mxCell id="c37" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=#d0d7de;" vertex="1" parent="1"><mxGeometry x="800" y="300" width="760" height="390" as="geometry" /></mxCell>
+        <mxCell id="c38" value="" style="rounded=0;html=1;fillColor=#2da44e;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="800" y="300" width="760" height="6" as="geometry" /></mxCell>
+        <mxCell id="c39" value="release()" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=22;fontColor=#0b5a2a;fontFamily=Helvetica;spacing=0;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="820" y="316" width="720" height="32" as="geometry" /></mxCell>
+        <mxCell id="c40" value="hand off to the next waiter, or clear tail if the queue is empty" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#57606a;fontFamily=Helvetica;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="350" width="720" height="22" as="geometry" /></mxCell>
+        <mxCell id="c41" value="MCSNode&amp; me = my_node();" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="386" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c42" value="// thread_local" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="1350" y="386" width="180" height="24" as="geometry" /></mxCell>
+        <mxCell id="c43" value="MCSNode* succ = me.next.load(acquire);" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="412" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c44" value="// successor link" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="1350" y="412" width="180" height="24" as="geometry" /></mxCell>
+        <mxCell id="c45" value="if (succ == nullptr) {" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="438" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c46" value="    if (tail.compare_exchange_strong(" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="464" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c47" value="// try to clear tail" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="1350" y="464" width="180" height="24" as="geometry" /></mxCell>
+        <mxCell id="c48" value="            &amp;me, nullptr, acq_rel))" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="490" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c49" value="        return;" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="516" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c50" value="// no waiter" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="1350" y="516" width="180" height="24" as="geometry" /></mxCell>
+        <mxCell id="c51" value="    while ((succ = me.next.load(acquire))" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="542" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c52" value="// enqueue raced us" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="1350" y="542" width="180" height="24" as="geometry" /></mxCell>
+        <mxCell id="c53" value="           == nullptr) cpu_relax();" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="568" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c54" value="// wait for link" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="1350" y="568" width="180" height="24" as="geometry" /></mxCell>
+        <mxCell id="c55" value="}" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="594" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c56" value="succ-&gt;locked.store(false, release);" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="820" y="620" width="520" height="24" as="geometry" /></mxCell>
+        <mxCell id="c57" value="// wake successor" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#6a737d;fontFamily=Consolas;spacing=0;" vertex="1" parent="1"><mxGeometry x="1350" y="620" width="180" height="24" as="geometry" /></mxCell>
+        <mxCell id="c58" value="The CAS handles the race with a concurrent enqueue into an empty queue." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#57606a;fontFamily=Helvetica;spacing=0;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="820" y="652" width="720" height="38" as="geometry" /></mxCell>
+        <mxCell id="c59" value="" style="rounded=1;html=1;fillColor=#fbfcfd;strokeColor=#d0d7de;" vertex="1" parent="1"><mxGeometry x="40" y="730" width="1520" height="430" as="geometry" /></mxCell>
+        <mxCell id="c60" value="Queue state under contention (FIFO)" style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=18;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="60" y="742" width="1000" height="26" as="geometry" /></mxCell>
+        <mxCell id="c61" value="N1 holds the lock; N2 and N3 wait on their own nodes. Arrows are next links." style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#57606a;fontFamily=Helvetica;spacing=0;" vertex="1" parent="1"><mxGeometry x="60" y="772" width="1200" height="22" as="geometry" /></mxCell>
+        <mxCell id="c62" value="N1 — holder" style="swimlane;startSize=30;html=1;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=14;" vertex="1" parent="1"><mxGeometry x="120" y="880" width="240" height="150" as="geometry" /></mxCell>
+        <mxCell id="c63" value="next → N2" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="c62"><mxGeometry x="12" y="34" width="216" height="26" as="geometry" /></mxCell>
+        <mxCell id="c64" value="locked = false" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="c62"><mxGeometry x="12" y="66" width="216" height="26" as="geometry" /></mxCell>
+        <mxCell id="c65" value="state: in critical section" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="c62"><mxGeometry x="12" y="98" width="216" height="26" as="geometry" /></mxCell>
+        <mxCell id="c66" value="N2 — waiter" style="swimlane;startSize=30;html=1;rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=14;" vertex="1" parent="1"><mxGeometry x="520" y="880" width="240" height="150" as="geometry" /></mxCell>
+        <mxCell id="c67" value="next → N3" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="c66"><mxGeometry x="12" y="34" width="216" height="26" as="geometry" /></mxCell>
+        <mxCell id="c68" value="locked = true" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="c66"><mxGeometry x="12" y="66" width="216" height="26" as="geometry" /></mxCell>
+        <mxCell id="c69" value="spins on N2.locked" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="c66"><mxGeometry x="12" y="98" width="216" height="26" as="geometry" /></mxCell>
+        <mxCell id="c70" value="N3 — waiter" style="swimlane;startSize=30;html=1;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=14;" vertex="1" parent="1"><mxGeometry x="920" y="880" width="240" height="150" as="geometry" /></mxCell>
+        <mxCell id="c71" value="next = null" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="c70"><mxGeometry x="12" y="34" width="216" height="26" as="geometry" /></mxCell>
+        <mxCell id="c72" value="locked = true" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="c70"><mxGeometry x="12" y="66" width="216" height="26" as="geometry" /></mxCell>
+        <mxCell id="c73" value="spins on N3.locked" style="text;html=0;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=13;fontColor=#1f2328;fontFamily=Consolas;spacing=0;" vertex="1" parent="c70"><mxGeometry x="12" y="98" width="216" height="26" as="geometry" /></mxCell>
+        <mxCell id="c74" value="null" style="rounded=1;html=1;fillColor=#f5f5f5;strokeColor=#999999;dashed=1;fontSize=13;fontFamily=Consolas;" vertex="1" parent="1"><mxGeometry x="1330" y="930" width="90" height="50" as="geometry" /></mxCell>
+        <mxCell id="e75" value="next" style="edgeStyle=none;html=1;rounded=0;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.5;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="c62" target="c66"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e76" value="next" style="edgeStyle=none;html=1;rounded=0;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.5;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="c66" target="c70"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e77" value="next" style="edgeStyle=none;html=1;rounded=0;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.5;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="c70" target="c74"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c78" value="tail" style="text;html=1;whiteSpace=nowrap;align=center;verticalAlign=middle;fontSize=14;fontColor=#1f2328;fontFamily=Helvetica;spacing=0;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1010" y="1075" width="60" height="24" as="geometry" /></mxCell>
+        <mxCell id="e79" value="" style="edgeStyle=none;html=1;rounded=0;endArrow=block;endSize=8;strokeColor=#57606a;strokeWidth=1.5;fontSize=12;fontColor=#57606a;labelBackgroundColor=#fbfcfd;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="1" source="c78" target="c70"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c80" value="release(N1): succ = N1.next = N2&#10;→ N2.locked.store(false) wakes N2; N3 stays queued until N2 releases." style="rounded=1;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=middle;spacing=12;fontSize=13;fontColor=#5c4700;" vertex="1" parent="1"><mxGeometry x="120" y="1075" width="760" height="80" as="geometry" /></mxCell>
+        <mxCell id="c81" value="Caveat: my_node() is thread_local → a thread must hold at most one MCS lock at a time. Memory orders shown as relaxed / acquire / release / acq_rel." style="text;html=1;whiteSpace=nowrap;align=left;verticalAlign=middle;fontSize=12;fontColor=#57606a;fontFamily=Helvetica;spacing=0;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="40" y="1185" width="1520" height="30" as="geometry" /></mxCell>
       </root>
     </mxGraphModel>
   </diagram>
