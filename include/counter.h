@@ -2,6 +2,8 @@
 
 #include <atomic>
 #include <mutex>
+#include <thread>
+#include <chrono>
 
 // 1. Mutex Counter
 class MutexCounter {
@@ -33,8 +35,8 @@ public:
         while (!value.compare_exchange_weak(
             expected, expected + 1
         )) {
-            // Nếu CAS thất bại, expected được cập nhật
-            // theo giá trị hiện tại; vòng lặp sẽ thử lại.
+            // CAS thất bại: expected được cập nhật
+            // và vòng lặp tiếp tục thử lại.
         }
     }
 
@@ -55,5 +57,45 @@ public:
 
     long long get() {
         return value.load();
+    }
+};
+
+// 4. CAS Counter with Exponential Backoff
+class CASBackoffCounter {
+private:
+    std::atomic<long long> value{0};
+
+public:
+    void increment() {
+        long long expected = value.load(
+            std::memory_order_relaxed
+        );
+
+        // Thời gian chờ ban đầu và giới hạn tối đa (microseconds)
+        int delay_us = 1;
+        const int max_delay_us = 1024;
+
+        while (!value.compare_exchange_weak(
+            expected,
+            expected + 1,
+            std::memory_order_relaxed,
+            std::memory_order_relaxed
+        )) {
+            // CAS thất bại: chờ trước khi thử lại
+            std::this_thread::sleep_for(
+                std::chrono::microseconds(delay_us)
+            );
+
+            // Tăng thời gian chờ theo cấp số nhân
+            if (delay_us < max_delay_us) {
+                delay_us = (delay_us * 2 > max_delay_us)
+                    ? max_delay_us
+                    : delay_us * 2;
+            }
+        }
+    }
+
+    long long get() {
+        return value.load(std::memory_order_relaxed);
     }
 };
