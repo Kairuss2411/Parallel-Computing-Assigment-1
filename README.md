@@ -2,8 +2,7 @@
 
 Reference implementation of the spinlocks / barriers / counters assignment.
 
-Status: **Assignment Part 1 (mutex locks) implemented, measured and reported.**
-Barrier, counter and MPI come in later steps.
+Status: **Lock + Barrier implemented.**
 
 Report: `report/report_part1.md` (printable HTML: `report/report_part1.html`,
 figures in `report/figures/`). Measurements are stored in
@@ -12,17 +11,40 @@ figures in `report/figures/`). Measurements are stored in
 ## Build
 
 ```bash
-make            # builds build/bench_lock and build/test_lock
-make test       # runs the lock correctness tests
+make            # builds lock + barrier binaries in build/
+make test       # runs lock and barrier correctness tests
+make barrier    # runs barrier test + writes results/barrier.csv
 ```
 
 ## Layout
 
-```
-include/  common.h, lock_tas.h, lock_ttas.h, lock_mcs.h, lock_baseline.h, lock.h
-src/      bench_lock.cpp
-tests/    test_lock.cpp
+```text
+include/  common.h, lock_tas.h, lock_ttas.h, lock_mcs.h, lock_baseline.h, lock.h, barrier_sense.h
+src/      bench_lock.cpp, bench_barrier.cpp
+tests/    test_lock.cpp, test_barrier.cpp
 scripts/  sysinfo.sh
+```
+
+## Barrier benchmark (Part 2)
+
+```bash
+./build/bench_barrier --mode=all --episodes=500000 --reps=5 --platform=i7-1265U
+```
+
+Outputs CSV rows (bench_mpi-style):
+
+`platform,task,algo,threads,outside_work,metric,value,rep`
+
+Compared algorithms:
+
+* `sense` (your Sense-Reversing barrier)
+* `std_barrier` (C++20 standard barrier)
+* `omp_barrier` (OpenMP barrier, when OpenMP is enabled)
+
+Correctness test:
+
+```bash
+./build/test_barrier [phases] [reps]
 ```
 
 ## Benchmark
