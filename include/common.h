@@ -1,60 +1,67 @@
 #pragma once
-// Shared utilities: cpu_relax, pin_thread, is_prime, do_not_optimize, timer.
 
-#include <atomic>
 #include <chrono>
-#include <cstddef>
-#include <cstdint>
+#include <cstdlib>
+#include <iostream>
+#include <string>
 #include <thread>
+#include <type_traits>
 
-#if defined(__linux__)
+#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
+#include <immintrin.h>
+#elif defined(__linux__)
 #include <pthread.h>
 #include <sched.h>
+#include <unistd.h>
 #endif
 
-#if defined(__x86_64__) || defined(__i386__)
-#include <immintrin.h>
+#ifndef CACHELINE
+#define CACHELINE 64
 #endif
 
-constexpr size_t CACHELINE = 64;
-
-// Benchmark knob for the backoff locks (0 = each lock's built-in default).
-// Units: pause iterations for TTASBackoffLock, nanoseconds for the sleep variant.
+// Used by the TTAS backoff benchmark variants; 0 means use each class's default.
 inline long g_max_delay = 0;
 
-// Hint the core that we are spinning (x86 PAUSE).
-inline void cpu_relax() {
-#if defined(__x86_64__) || defined(__i386__)
+inline void cpu_relax() noexcept {
+#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
     _mm_pause();
-#elif defined(__aarch64__)
-    asm volatile("yield" ::: "memory");
+#elif (defined(__x86_64__) || defined(__i386__)) && \
+      (defined(__GNUC__) || defined(__clang__))
+    __builtin_ia32_pause();
 #else
-    std::atomic_signal_fence(std::memory_order_seq_cst);
+    std::this_thread::yield();
 #endif
 }
+#define CPU_RELAX_DEFINED
 
-// Pin the calling thread to a logical CPU (avoid migration noise in measurements).
-// Returns false if pinning is not permitted (e.g. restricted container); harmless.
-inline bool pin_thread(int core) {
-    if (core < 0) return false;
+inline unsigned hw_threads() noexcept {
+    const unsigned n = std::thread::hardware_concurrency();
+    return n == 0 ? 1u : n;
+}
+
+inline double now_ms() noexcept {
+    using clock = std::chrono::steady_clock;
+    return std::chrono::duration<double, std::milli>(
+        clock::now().time_since_epoch()).count();
+}
+
+// Best-effort CPU affinity. Failure is intentionally ignored.
+inline void pin_thread(unsigned cpu) noexcept {
 #if defined(__linux__)
-    cpu_set_t set;
-    CPU_ZERO(&set);
-    CPU_SET(core, &set);
-    return pthread_setaffinity_np(pthread_self(), sizeof(set), &set) == 0;
-else
-    (void)core;
-    return false
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(cpu % hw_threads(), &cpuset);
+    (void)pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
+#elif defined(_WIN32)
+    // Native Windows affinity support can be added here; do not fail the run.
+    (void)cpu;
+#else
+    (void)cpu;
 #endif
-}
-
-inline int hw_threads() {
-    unsigned n = std::thread::hardware_concurrency();
-    return n ? static_cast<int>(n) : 1;
 }
 
 // is_prime exactly as given in the assignment.
-inline int is_prime(int p) {
+inline int is_prime(int p) noexcept {
     if (p < 2) return 0;
     int d;
     for (d = 2; d < p; d = d + 1)
@@ -62,14 +69,55 @@ inline int is_prime(int p) {
     return 1;
 }
 
-// Prevent the compiler from eliminating a pure computation whose result is unused.
 template <class T>
-inline void do_not_optimize(T const& v) {
-    asm volatile("" : : "g"(v) : "memory");
+inline void do_not_optimize(const T& value) noexcept {
+#if defined(__GNUC__) || defined(__clang__)
+    asm volatile("" : : "g"(value) : "memory");
+#else
+    volatile const T* sink = &value;
+    (void)sink;
+#endif
 }
 
-// Wall-clock milliseconds since an arbitrary epoch (steady clock).
-inline double now_ms() {
-    using namespace std::chrono;
-    return duration<double, std::milli>(steady_clock::now().time_since_epoch()).count();
+// Parse command-line arguments in --key=value form.
+inline std::string get_str_arg(int argc, char** argv,
+                               const std::string& key,
+                               const std::string& default_value) {
+    const std::string prefix = "--" + key + "=";
+    for (int i = 1; i < argc; ++i) {
+        const std::string arg(argv[i]);
+        if (arg.rfind(prefix, 0) == 0) return arg.substr(prefix.size());
+    }
+    return default_value;
+}
+
+inline int get_int_arg(int argc, char** argv,
+                       const std::string& key,
+                       int default_value) {
+    const std::string value = get_str_arg(argc, argv, key, "");
+    if (value.empty()) return default_value;
+
+    char* end = nullptr;
+    const long parsed = std::strtol(value.c_str(), &end, 10);
+    if (end == value.c_str() || *end != '\0' ||
+        parsed < -2147483647L - 1L || parsed > 2147483647L) {
+        std::cerr << "Invalid integer for --" << key << ": " << value << '\n';
+        std::exit(2);
+    }
+    return static_cast<int>(parsed);
+}
+
+// CSV columns: platform,task,algorithm,threads,outside_work,metric,value,rep
+inline void csv_row(const std::string& platform, int task,
+                    const std::string& algorithm, int threads,
+                    int outside_work, const std::string& metric,
+                    double value, int rep) {
+    std::cout << platform << ','
+              << task << ','
+              << algorithm << ','
+              << threads << ','
+              << outside_work << ','
+              << metric << ','
+              << value << ','
+              << rep << '\n';
 }

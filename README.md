@@ -2,8 +2,7 @@
 
 Reference implementation of the spinlocks / barriers / counters assignment.
 
-Status: **Assignment Part 1 (mutex locks) implemented, measured and reported.**
-Barrier, counter and MPI come in later steps.
+Status: **Lock + Barrier implemented.**
 
 Report: `report/report_part1.md` (printable HTML: `report/report_part1.html`,
 figures in `report/figures/`). Measurements are stored in
@@ -12,18 +11,48 @@ figures in `report/figures/`). Measurements are stored in
 ## Build
 
 ```bash
-make            # builds build/bench_lock and build/test_lock
-make test       # runs the lock correctness tests
+make            # builds lock + barrier binaries in build/
+make test       # runs lock and barrier correctness tests
+make barrier    # runs barrier test + writes results/barrier.csv
 ```
 
 ## Layout
 
-```
-include/  common.h, lock_tas.h, lock_ttas.h, lock_mcs.h, lock_baseline.h, lock.h
-src/      bench_lock.cpp
-tests/    test_lock.cpp
+```text
+include/  common.h, lock_tas.h, lock_ttas.h, lock_mcs.h, lock_baseline.h, lock.h, barrier_sense.h
+src/      bench_lock.cpp, bench_barrier.cpp
+tests/    test_lock.cpp, test_barrier.cpp
 scripts/  sysinfo.sh
 ```
+
+## Barrier benchmark (Part 2)
+
+Build the project first with `make`. Run the correctness test:
+
+```bash
+./build/test_barrier
+```
+
+Run one algorithm at a time (the current program does not implement `--mode=all`):
+
+```bash
+./build/bench_barrier --algorithm=srb --threads=4 --episodes=500000 --reps=5 --platform=my-machine
+./build/bench_barrier --algorithm=srb_backoff --threads=4 --episodes=500000 --reps=5 --platform=my-machine
+./build/bench_barrier --algorithm=std_barrier --threads=4 --episodes=500000 --reps=5 --platform=my-machine
+```
+
+On supported POSIX systems, `pthread_barrier` is also available:
+
+```bash
+./build/bench_barrier --algorithm=pthread_barrier --threads=4 --episodes=500000 --reps=5 --platform=my-machine
+```
+
+CSV columns are `platform,task,algorithm,threads,outside_work,metric,value,rep`.
+The current implementation benchmarks `srb`, `srb_backoff`, `std_barrier`, and
+optionally `pthread_barrier`; it does not currently implement `omp_barrier`.
+
+**Scope note:** the uploaded source tree contains lock and barrier code, but no
+Concurrent Counters (Task 3) implementation or benchmark yet. See `REVIEW_NOTES.txt`.
 
 ## Benchmark
 

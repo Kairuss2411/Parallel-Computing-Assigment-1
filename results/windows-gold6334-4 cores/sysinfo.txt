@@ -1,0 +1,21 @@
+platform=windows-gold6334-4 cores
+timestamp=2026-10-28 20:51:51
+
+[OS]
+caption=Microsoft Windows Server 2022 Standard
+version=10.0.20348
+arch=64-bit
+
+[CPU]
+name=Intel(R) Xeon(R) Gold 6334 CPU @ 3.60GHz
+cores=4
+logical_processors=4
+max_clock_mhz=3592
+
+[Machine]
+manufacturer=VMware, Inc.
+model=VMware20,1
+ram_bytes=12883906560
+
+[Compiler]
+g++=g++.exe (Rev6, Built by MSYS2 project) 16.2.0
