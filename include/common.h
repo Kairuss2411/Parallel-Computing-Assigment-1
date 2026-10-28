@@ -60,13 +60,12 @@ inline void pin_thread(unsigned cpu) noexcept {
 #endif
 }
 
+// is_prime exactly as given in the assignment.
 inline int is_prime(int p) noexcept {
     if (p < 2) return 0;
-    if (p == 2) return 1;
-    if (p % 2 == 0) return 0;
-    for (int d = 3; d <= p / d; d += 2) {
+    int d;
+    for (d = 2; d < p; d = d + 1)
         if (p % d == 0) return 0;
-    }
     return 1;
 }
 
