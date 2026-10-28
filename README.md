@@ -27,25 +27,32 @@ scripts/  sysinfo.sh
 
 ## Barrier benchmark (Part 2)
 
-```bash
-./build/bench_barrier --mode=all --episodes=500000 --reps=5 --platform=i7-1265U
-```
-
-Outputs CSV rows (bench_mpi-style):
-
-`platform,task,algo,threads,outside_work,metric,value,rep`
-
-Compared algorithms:
-
-* `sense` (your Sense-Reversing barrier)
-* `std_barrier` (C++20 standard barrier)
-* `omp_barrier` (OpenMP barrier, when OpenMP is enabled)
-
-Correctness test:
+Build the project first with `make`. Run the correctness test:
 
 ```bash
-./build/test_barrier [phases] [reps]
+./build/test_barrier
 ```
+
+Run one algorithm at a time (the current program does not implement `--mode=all`):
+
+```bash
+./build/bench_barrier --algorithm=srb --threads=4 --episodes=500000 --reps=5 --platform=my-machine
+./build/bench_barrier --algorithm=srb_backoff --threads=4 --episodes=500000 --reps=5 --platform=my-machine
+./build/bench_barrier --algorithm=std_barrier --threads=4 --episodes=500000 --reps=5 --platform=my-machine
+```
+
+On supported POSIX systems, `pthread_barrier` is also available:
+
+```bash
+./build/bench_barrier --algorithm=pthread_barrier --threads=4 --episodes=500000 --reps=5 --platform=my-machine
+```
+
+CSV columns are `platform,task,algorithm,threads,outside_work,metric,value,rep`.
+The current implementation benchmarks `srb`, `srb_backoff`, `std_barrier`, and
+optionally `pthread_barrier`; it does not currently implement `omp_barrier`.
+
+**Scope note:** the uploaded source tree contains lock and barrier code, but no
+Concurrent Counters (Task 3) implementation or benchmark yet. See `REVIEW_NOTES.txt`.
 
 ## Benchmark
 

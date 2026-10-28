@@ -14,7 +14,8 @@
 #define HAVE_PTHREAD_BARRIER 1
 #endif
 
-// CPU pause hint on x86/x64; yield on other architectures.
+// CPU pause helper is provided by common.h in this repository.
+#ifndef CPU_RELAX_DEFINED
 inline void cpu_relax() noexcept {
 #if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
     _mm_pause();
@@ -25,6 +26,8 @@ inline void cpu_relax() noexcept {
     std::this_thread::yield();
 #endif
 }
+#define CPU_RELAX_DEFINED
+#endif
 
 // Reusable centralized sense-reversing barrier.
 // The exits counter prevents a fast thread from entering the next episode

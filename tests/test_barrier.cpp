@@ -82,8 +82,13 @@ bool test_zero_arg_barrier(const std::string& name, int threads, int episodes) {
 
 int main() {
     constexpr int episodes = 200;
-    const int thread_counts[] = {1, 2, 4, 8};
     bool all_passed = true;
+
+    std::vector<int> thread_counts;
+    const int hw = static_cast<int>(std::thread::hardware_concurrency());
+    for (int t = 1; t <= std::max(1, hw); t *= 2) thread_counts.push_back(t);
+    if (thread_counts.empty() || thread_counts.back() != std::max(1, hw))
+        thread_counts.push_back(std::max(1, hw));
 
     for (int n : thread_counts) {
         all_passed &= test_barrier<SenseBarrier>("srb", n, episodes);
