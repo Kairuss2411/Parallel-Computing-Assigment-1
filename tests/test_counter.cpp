@@ -63,6 +63,10 @@ int main() {
         all_passed &= test_counter<FAACounter>(
             "FAA", n, increments
         );
+
+        all_passed &= test_counter<CASBackoffCounter>(
+            "CAS_Backoff", n, increments
+        );
     }
 
     if (!all_passed) {

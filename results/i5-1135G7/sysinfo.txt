@@ -1,0 +1,12 @@
+=== date ===
+2026-10-29T00:55:30+07:00
+=== environment ===
+MINGW64_NT-10.0-26300 DESKTOP-DFHQTJB 3.6.10-c770e1b9.x86_64 2026-09-26 06:38 UTC x86_64 Msys
+Shell: MSYS2 UCRT64
+=== CPU ===
+Model: Intel Core i5-1135G7
+Logical processors available: 8
+=== compiler ===
+g++.exe (Rev4, Built by MSYS2 project) 16.2.0
+GNU Make 4.4.1
+Python 3.14.7

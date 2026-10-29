@@ -12,13 +12,15 @@ using namespace std::chrono;
 
 // Benchmark one counter implementation.
 template <typename Counter>
-void run_benchmark(
+bool run_benchmark(
     const string& name,
     int num_threads,
     long long increments_per_thread,
     int repetitions,
     ofstream& csv
 ) {
+    bool all_correct = true;
+
     for (int run = 1; run <= repetitions; ++run) {
         Counter counter;
         vector<thread> threads;
@@ -72,9 +74,13 @@ void run_benchmark(
             << '\n';
 
         if (!correct) {
-            cerr << "ERROR: Counter result is incorrect!\n";
+            cerr << "ERROR: " << name
+                 << " produced an incorrect counter value!\n";
+            all_correct = false;
         }
     }
+
+    return all_correct;
 }
 
 int main() {
@@ -92,17 +98,23 @@ int main() {
     csv << "algorithm,threads,increments_per_thread,run,"
         << "expected,actual,time_ms,correctness\n";
 
+    bool all_correct = true;
+
     for (int n : thread_counts) {
-        run_benchmark<MutexCounter>(
+        all_correct &= run_benchmark<MutexCounter>(
             "Mutex", n, increments_per_thread, repetitions, csv
         );
 
-        run_benchmark<CASCounter>(
+        all_correct &= run_benchmark<CASCounter>(
             "CAS", n, increments_per_thread, repetitions, csv
         );
 
-        run_benchmark<FAACounter>(
+        all_correct &= run_benchmark<FAACounter>(
             "FAA", n, increments_per_thread, repetitions, csv
+        );
+
+        all_correct &= run_benchmark<CASBackoffCounter>(
+            "CAS_Backoff", n, increments_per_thread, repetitions, csv
         );
     }
 
@@ -111,5 +123,11 @@ int main() {
     cout << "\nBenchmark finished.\n";
     cout << "Results saved to counter_results.csv\n";
 
+    if (!all_correct) {
+        cerr << "Some benchmark runs FAILED.\n";
+        return 1;
+    }
+
+    cout << "All benchmark counter checks PASSED.\n";
     return 0;
 }
