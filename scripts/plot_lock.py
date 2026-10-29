@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
-"""Part 1 (mutex locks) plots: CSV -> report/figures/*.png.
+"""Part 1 (mutex locks) plots: CSV -> report/figures/<platform>/*.png.
 
-By default every platform under results/<platform>/ is merged and each point is
-the median over all platforms and repetitions (an average view across machines).
-Pass platform names to restrict the merge to those folders.
+Every platform under results/<platform>/ is plotted separately. Rows are never
+merged across machines, because CPU model, core count, clock/turbo behaviour,
+compiler and virtualisation differ and would make the comparison unfair.
+Each figure is therefore the median over the repetitions of a single machine.
+
+Output layout:
+
+    report/figures/<platform-slug>/lock_time.png
+    report/figures/<platform-slug>/lock_perop.png
+    report/figures/<platform-slug>/lock_contention_t<T>.png
+    report/figures/<platform-slug>/lock_backoff.png
+    report/figures/<platform-slug>/lock_backoff_compare.png
+    report/figures/<platform-slug>/lock_oversub.png        (if data exists)
 
 Reads (from each selected platform folder):
     lock.csv           main sweep, required
@@ -11,6 +21,7 @@ Reads (from each selected platform folder):
     lock_oversub.csv   threads > cores, optional
 
 Usage: python3 scripts/plot_lock.py [platform ...]
+       (no argument = plot every platform that has a lock.csv)
 """
 import glob
 import os
@@ -42,8 +53,6 @@ if len(sys.argv) > 1:
 else:
     PLATFORMS = ALL_PLATFORMS
 
-os.makedirs(FIG, exist_ok=True)
-
 ORDER = ["tas", "ttas", "ttas_backoff", "ttas_backoff_sleep", "mcs",
          "std_mutex", "pthread", "omp"]
 # OUTSIDE_WORK values of the current sweep; the old 16 (measured before the
@@ -61,37 +70,45 @@ STYLE = {
 }
 
 
-def load(fname):
-    """Read `fname` from every selected platform and concatenate the rows."""
-    frames = []
-    for plat in PLATFORMS:
-        path = os.path.join(RES_ROOT, plat, fname)
-        if not os.path.exists(path):
-            continue
-        df = pd.read_csv(path)
-        df["platform"] = plat
-        frames.append(df)
-    if not frames:
+def slug(platform):
+    """Folder-safe name for a platform, e.g. 'gold 4 cores' -> 'gold_4_cores'."""
+    return platform.lower().replace(" ", "_")
+
+
+def load(platform, fname):
+    """Read one CSV of a single platform; None when the file does not exist."""
+    path = os.path.join(RES_ROOT, platform, fname)
+    if not os.path.exists(path):
         return None
-    return pd.concat(frames, ignore_index=True)
+    df = pd.read_csv(path)
+    df["platform"] = platform
+    return df
 
 
-def save(fig, name):
-    path = os.path.join(FIG, name)
+def warn_duplicates(df, platform, fname):
+    """Appending sweeps without --force duplicates (algo,threads,ow,rep) rows."""
+    keys = [c for c in ("algo", "threads", "outside_work", "max_delay", "rep")
+            if c in df.columns]
+    dup = int(df.duplicated(keys).sum())
+    if dup:
+        print(f"warning: {platform}/{fname}: {dup} duplicated row(s) "
+              f"(multiple sweeps appended?); medians mix those sessions",
+              file=sys.stderr)
+
+
+def save(fig, outdir, name):
+    path = os.path.join(outdir, name)
     fig.savefig(path, dpi=160, bbox_inches="tight")
     plt.close(fig)
     print("wrote", path)
 
 
-def platform_note(nplat):
-    return f"median gộp {nplat} platform"
-
-
-def main_sweep():
+def main_sweep(platform, outdir):
     """time vs threads (+ per-op cost) for every OUTSIDE_WORK value."""
-    df = load("lock.csv")
+    df = load(platform, "lock.csv")
     if df is None:
         return
+    warn_duplicates(df, platform, "lock.csv")
     df = df[df.outside_work.isin(OW_KEEP)].copy()
     if df.empty:
         return
@@ -102,8 +119,6 @@ def main_sweep():
            .reset_index())
     iters = int(df.iters.max())
     nprime = int(df.N.max())
-    nplat = df.platform.nunique()
-    note = platform_note(nplat)
     ows = sorted(df.outside_work.unique())
 
     def panel_grid(metric, ylabel, title):
@@ -132,14 +147,15 @@ def main_sweep():
 
     save(panel_grid(
         "time_ms", "Thời gian chạy cả chương trình (ms)",
-        f"Part 1 – Lock: thời gian chạy (iters={iters}, N={nprime}, {note})"),
-        "lock_time.png")
+        f"Part 1 – Lock ({platform}): thời gian chạy "
+        f"(iters={iters}, N={nprime})"),
+        outdir, "lock_time.png")
 
     save(panel_grid(
         "per_op_us", "Thời gian trung bình mỗi thao tác CS (µs)",
-        f"Part 1 – Lock: chi phí mỗi thao tác (iters={iters}, N={nprime}, "
-        f"{note})"),
-        "lock_perop.png")
+        f"Part 1 – Lock ({platform}): chi phí mỗi thao tác "
+        f"(iters={iters}, N={nprime})"),
+        outdir, "lock_perop.png")
 
     # Summary figure: largest thread count, all OUTSIDE_WORK values
     tmax = int(df.threads.max())
@@ -149,26 +165,26 @@ def main_sweep():
     ax = pivot.plot(kind="bar", figsize=(9, 4.5), width=0.8)
     ax.set_xlabel("Thuật toán")
     ax.set_ylabel("Thời gian (ms, median)")
-    ax.set_title(f"Part 1 – Ảnh hưởng của contention (T={tmax} thread, "
-                 f"N={nprime}, {note})")
+    ax.set_title(f"Part 1 – Ảnh hưởng của contention "
+                 f"({platform}, T={tmax} thread, N={nprime})")
     ax.grid(True, axis="y", alpha=0.3)
     ax.legend(title="OUTSIDE_WORK", fontsize=8)
     plt.xticks(rotation=25, ha="right")
-    save(ax.figure, f"lock_contention_t{tmax}.png")
+    save(ax.figure, outdir, f"lock_contention_t{tmax}.png")
 
 
-def backoff_sweep():
+def backoff_sweep(platform, outdir):
     """MAX_DELAY curves for both backoff variants, OUTSIDE_WORK = 0 only."""
-    df = load("lock_backoff.csv")
+    df = load(platform, "lock_backoff.csv")
     if df is None:
         return
+    warn_duplicates(df, platform, "lock_backoff.csv")
     df = df[(df.outside_work == 0)
             & (df.algo.isin(["ttas_backoff", "ttas_backoff_sleep"]))]
     if df.empty:
         return
     g = (df.groupby(["algo", "threads", "max_delay"])["time_ms"]
            .median().reset_index())
-    nplat = df.platform.nunique()
 
     fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.5), squeeze=False)
     axes = axes[0]
@@ -189,20 +205,20 @@ def backoff_sweep():
         ax.set_title(algo)
         ax.grid(True, alpha=0.3)
         ax.legend(fontsize=8, title="threads")
-    fig.suptitle(f"Part 1 – Tinh chỉnh backoff, OUTSIDE_WORK = 0 "
-                 f"({platform_note(nplat)})")
+    fig.suptitle(f"Part 1 – Tinh chỉnh backoff ({platform}), "
+                 f"OUTSIDE_WORK = 0")
     fig.tight_layout(rect=(0, 0, 1, 0.93))
-    save(fig, "lock_backoff.png")
+    save(fig, outdir, "lock_backoff.png")
 
 
-def backoff_compare(ow=0):
+def backoff_compare(platform, outdir, ow=0):
     """TTAS vs TTAS+backoff(pause) vs TTAS+backoff(sleep) at OUTSIDE_WORK=0.
 
     'ttas' baseline comes from lock.csv (built-in settings); the two backoff
     variants come from lock_backoff.csv (one line per MAX_DELAY value).
     """
-    main = load("lock.csv")
-    bf = load("lock_backoff.csv")
+    main = load(platform, "lock.csv")
+    bf = load(platform, "lock_backoff.csv")
     if main is None or bf is None:
         return
     main = main[main.outside_work == ow].copy()
@@ -211,7 +227,6 @@ def backoff_compare(ow=0):
     if base.empty:
         return
     nprime = int(main.N.max())
-    nplat = main.platform.nunique()
 
     bf = bf[(bf.outside_work == ow)
             & (bf.algo.isin(["ttas_backoff", "ttas_backoff_sleep"]))].copy()
@@ -261,17 +276,17 @@ def backoff_compare(ow=0):
     ax2.grid(True, alpha=0.3)
     ax2.set_xticks(sorted(base.threads.unique()))
 
-    fig.suptitle(f"Part 1 – TTAS vs TTAS+backoff vs TTAS+backoff(sleep), "
-                 f"N={nprime}, {platform_note(nplat)}")
+    fig.suptitle(f"Part 1 – TTAS vs TTAS+backoff vs TTAS+backoff(sleep) "
+                 f"({platform}), N={nprime}")
     handles, labels = ax.get_legend_handles_labels()
     fig.subplots_adjust(top=0.80, bottom=0.28, wspace=0.22)
     fig.legend(handles, labels, loc="lower center", ncol=4, fontsize=8,
                frameon=False, bbox_to_anchor=(0.5, -0.01))
-    save(fig, "lock_backoff_compare.png")
+    save(fig, outdir, "lock_backoff_compare.png")
 
 
-def oversub():
-    df = load("lock_oversub.csv")
+def oversub(platform, outdir):
+    df = load(platform, "lock_oversub.csv")
     if df is None:
         return
     df = df[df.outside_work.isin(OW_KEEP)].copy()
@@ -280,7 +295,6 @@ def oversub():
     df["ops_per_sec"] = df.threads * df.iters * 1000.0 / df.time_ms
     med = (df.groupby(["algo", "threads", "outside_work"])["ops_per_sec"]
              .median().reset_index())
-    nplat = df.platform.nunique()
     tmax = int(med.threads.max())
     ows = sorted(med.outside_work.unique())
 
@@ -297,15 +311,17 @@ def oversub():
         ax.set_title(f"OUTSIDE_WORK = {ow}")
         ax.grid(True, axis="y", alpha=0.3)
         ax.tick_params(axis="x", rotation=25)
-    fig.suptitle(f"Part 1 – Oversubscription (T={tmax}), "
-                 f"{platform_note(nplat)}")
+    fig.suptitle(f"Part 1 – Oversubscription ({platform}, T={tmax})")
     fig.tight_layout(rect=(0, 0, 1, 0.93))
-    save(fig, "lock_oversub.png")
+    save(fig, outdir, "lock_oversub.png")
 
 
 if __name__ == "__main__":
-    print("platforms:", ", ".join(PLATFORMS))
-    main_sweep()        # lock.csv: time + per-op, one figure per metric
-    backoff_sweep()     # MAX_DELAY tuning, OW=0 only
-    backoff_compare()   # ttas vs both backoff variants, OW=0
-    oversub()           # optional
+    for platform in PLATFORMS:
+        outdir = os.path.join(FIG, slug(platform))
+        os.makedirs(outdir, exist_ok=True)
+        print(f"== {platform} -> {outdir}")
+        main_sweep(platform, outdir)      # lock.csv: time + per-op
+        backoff_sweep(platform, outdir)   # MAX_DELAY tuning, OW=0 only
+        backoff_compare(platform, outdir)  # ttas vs both backoff variants
+        oversub(platform, outdir)         # optional
